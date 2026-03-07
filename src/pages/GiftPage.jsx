@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { useGiftData } from '../hooks/useGiftData'
+import { useYouTubeMetadata } from '../hooks/useYouTubeMetadata'
 
 import LoadingSection from '../components/LoadingSection'
 import LetterSection from '../components/LetterSection'
@@ -8,21 +9,53 @@ import GallerySection from '../components/GallerySection'
 import CounterSection from '../components/CounterSection'
 import FinalSection from '../components/FinalSection'
 import FloatingPlayer from '../components/FloatingPlayer'
+import YouTubePlayer from '../components/YouTubePlayer'
 
 export default function GiftPage() {
   const { slug } = useParams()
   const { data, loading, error } = useGiftData(slug)
 
-  const [appLoading, setAppLoading] = useState(true)   // controla a tela de loading
+  const [appLoading, setAppLoading] = useState(true)
   const [musicStarted, setMusicStarted] = useState(false)
+  const [isPlaying, setIsPlaying] = useState(false)
 
-  // Tela de loading (animação inicial)
-  // onDone é chamado quando o AnimatePresence termina o fade-out
+  const playerRef = useRef(null)
+  const pendingPlayRef = useRef(false)
+
+  // Busca título e artista direto do YouTube — sem mock, sem armazenar no banco
+  const { title: musicTitle, artist: musicArtist } = useYouTubeMetadata(data?.music_url)
+
+  function handlePlayerReady(player) {
+    playerRef.current = player
+    if (pendingPlayRef.current) {
+      player.playVideo()
+      pendingPlayRef.current = false
+    }
+  }
+
+  function handleMusicStart() {
+    setMusicStarted(true)
+    if (playerRef.current) {
+      playerRef.current.playVideo()
+    } else {
+      pendingPlayRef.current = true
+    }
+  }
+
+  function handleTogglePlay() {
+    const player = playerRef.current
+    if (!player) return
+    if (player.getPlayerState() === window.YT?.PlayerState?.PLAYING) {
+      player.pauseVideo()
+    } else {
+      player.playVideo()
+    }
+  }
+
   if (appLoading) {
     return <LoadingSection onDone={() => setAppLoading(false)} />
   }
 
-  // Dados ainda buscando do Supabase após o loading visual
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center"
@@ -50,18 +83,24 @@ export default function GiftPage() {
   }
 
   return (
-    <>
-      {/* Player flutuante — some na seção final */}
+    <div style={{ paddingBottom: musicStarted ? 88 : 0 }}>
+      <YouTubePlayer
+        musicUrl={data.music_url}
+        onPlayerReady={handlePlayerReady}
+        onPlaybackUpdate={setIsPlaying}
+      />
+
       <FloatingPlayer
-        musicTitle={data.music_title}
-        musicArtist={data.music_artist}
+        musicTitle={musicTitle}
+        musicArtist={musicArtist}
+        isPlaying={isPlaying}
+        onTogglePlay={handleTogglePlay}
         visible={musicStarted}
       />
 
-      {/* Seções em scroll contínuo */}
       <LetterSection
         letterText={data.letter_text}
-        onMusicStart={() => setMusicStarted(true)}
+        onMusicStart={handleMusicStart}
       />
 
       <GallerySection photos={data.photos} />
@@ -70,9 +109,9 @@ export default function GiftPage() {
 
       <FinalSection
         names={data.names}
-        musicTitle={data.music_title}
-        musicArtist={data.music_artist}
+        musicTitle={musicTitle}
+        musicArtist={musicArtist}
       />
-    </>
+    </div>
   )
 }

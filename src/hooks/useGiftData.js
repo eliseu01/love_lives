@@ -9,9 +9,7 @@ const DEV_DATA = {
 Cada momento ao seu lado é uma lembrança que guardo com carinho.
 Obrigado por cada sorriso, cada abraço, cada aventura.
 Te amo hoje e sempre.`,
-  music_title: 'august',
-  music_artist: 'Taylor Swift',
-  music_url: 'https://open.spotify.com/track/3hUxzQpSfdDqwM3ZTFQQ0F',
+  music_url: 'https://www.youtube.com/watch?v=VUkt0mrkR5s',
   photos: [
     { src: null, caption: 'O começo de tudo' },
     { src: null, caption: 'Nossa primeira vez' },

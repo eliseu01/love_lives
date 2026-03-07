@@ -27,7 +27,7 @@ export default function LetterSection({ letterText, onMusicStart }) {
         {(stage === 'closed' || stage === 'opening') && (
           <motion.div
             key="envelope"
-            className="flex flex-col items-center gap-4 cursor-pointer select-none"
+            className="flex flex-col items-center gap-4 cursor-pointer select-none w-full"
             onClick={handleEnvelopeClick}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -52,8 +52,7 @@ export default function LetterSection({ letterText, onMusicStart }) {
         {(stage === 'rising' || stage === 'expanded') && (
           <motion.div
             key="letter"
-            className="w-full"
-            style={{ maxWidth: 380 }}
+            className="w-full flex justify-center"
             initial={{ opacity: 0, y: 60 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: 'easeOut' }}
@@ -68,8 +67,13 @@ export default function LetterSection({ letterText, onMusicStart }) {
 
 function EnvelopeSVG({ isOpening }) {
   return (
-    <div className="relative" style={{ width: 220, height: 160 }}>
-      <svg width="220" height="160" viewBox="0 0 220 160" fill="none">
+    // width fluido — ocupa até 220px mas encolhe em telas menores
+    <div style={{ width: '100%', maxWidth: 220 }}>
+      <svg
+        viewBox="0 0 220 160"
+        fill="none"
+        style={{ width: '100%', height: 'auto', display: 'block' }}
+      >
         {/* Corpo do envelope */}
         <rect x="4" y="40" width="212" height="116" rx="6"
           fill="#F5E6D3" stroke="#C2185B" strokeWidth="2" />
@@ -105,12 +109,12 @@ function EnvelopeSVG({ isOpening }) {
 function LetterCard({ text }) {
   return (
     <div
-      className="rounded-lg p-6 mx-auto"
+      className="rounded-lg p-6"
       style={{
         background: '#FFFDF9',
         border: '1px solid #F0D9C8',
         boxShadow: '0 8px 32px rgba(194,24,91,0.08)',
-        width: '85%',
+        width: '90%',
       }}
     >
       {/* Ornamento floral */}
@@ -126,7 +130,7 @@ function LetterCard({ text }) {
       </h2>
 
       <p
-        className="whitespace-pre-line leading-relaxed text-sm"
+        className="whitespace-pre-line text-sm"
         style={{ fontFamily: 'Lato, sans-serif', color: '#3E2723', lineHeight: 1.8 }}
       >
         {text}

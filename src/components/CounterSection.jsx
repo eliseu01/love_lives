@@ -21,19 +21,22 @@ function CountBlock({ value, label }) {
     <div
       className="flex flex-col items-center justify-center"
       style={{
-        width: 72,
-        height: 72,
+        // clamp: mínimo 56px, ideal 16vw, máximo 72px
+        // garante que 4 blocos + separadores caibam em qualquer tela >= 320px
+        width: 'clamp(56px, 16vw, 72px)',
+        height: 'clamp(56px, 16vw, 72px)',
         background: '#FFFFFF',
         borderRadius: 12,
         border: '1px solid #F48FB1',
         boxShadow: '0 2px 8px rgba(194,24,91,0.08)',
+        flexShrink: 0,
       }}
     >
       <span
         style={{
           fontFamily: 'Playfair Display, serif',
           fontWeight: 700,
-          fontSize: 26,
+          fontSize: 'clamp(18px, 5vw, 26px)',
           color: '#C2185B',
           lineHeight: 1,
         }}
@@ -43,7 +46,7 @@ function CountBlock({ value, label }) {
       <span
         style={{
           fontFamily: 'Lato, sans-serif',
-          fontSize: 9,
+          fontSize: 'clamp(7px, 2vw, 9px)',
           textTransform: 'uppercase',
           letterSpacing: '0.05em',
           color: '#F48FB1',
@@ -74,7 +77,7 @@ export default function CounterSection({ names, startDate }) {
 
   return (
     <section
-      className="min-h-screen flex flex-col items-center justify-center px-6 py-16"
+      className="min-h-screen flex flex-col items-center justify-center px-4 py-16"
       style={{ background: 'linear-gradient(180deg, #FFF0F3 0%, #FFF8F5 100%)' }}
     >
       <h2
@@ -117,10 +120,11 @@ function Separator() {
     <span
       style={{
         fontFamily: 'Playfair Display, serif',
-        fontSize: 20,
+        fontSize: 'clamp(14px, 4vw, 20px)',
         color: '#C2185B',
         lineHeight: 1,
         marginBottom: 12,
+        flexShrink: 0,
       }}
     >
       :

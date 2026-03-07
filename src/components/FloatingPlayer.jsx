@@ -1,67 +1,70 @@
-import { useState } from 'react'
 import { motion } from 'framer-motion'
 
-export default function FloatingPlayer({ musicTitle, musicArtist, visible }) {
-  const [playing, setPlaying] = useState(true)
-
+export default function FloatingPlayer({ musicTitle, musicArtist, isPlaying, onTogglePlay, visible }) {
   if (!visible) return null
 
   return (
-    <motion.div
-      initial={{ y: 80 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.3, ease: 'easeOut' }}
+    <div
       style={{
         position: 'fixed',
-        bottom: 0,
-        left: '50%',
-        transform: 'translateX(-50%)',
-        width: '100%',
-        maxWidth: 430,
-        height: 56,
-        background: 'rgba(255,255,255,0.92)',
-        backdropFilter: 'blur(8px)',
-        borderTop: '1px solid #F48FB1',
+        bottom: 16,
+        left: 0,
+        right: 0,
         display: 'flex',
-        alignItems: 'center',
+        justifyContent: 'center',
         padding: '0 16px',
-        gap: 12,
         zIndex: 40,
+        pointerEvents: 'none',
       }}
     >
-      {/* Ícone nota musical */}
-      <span style={{ fontSize: 18, color: '#C2185B' }}>♫</span>
-
-      {/* Nome da música */}
-      <div className="flex-1 min-w-0">
-        <p
-          className="truncate"
-          style={{
-            fontFamily: 'Lato, sans-serif',
-            fontSize: 13,
-            color: '#3E2723',
-          }}
-        >
-          {musicTitle} — {musicArtist}
-        </p>
-      </div>
-
-      {/* Play/Pause */}
-      <button
-        onClick={() => setPlaying((p) => !p)}
+      <motion.div
+        initial={{ y: 80, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.3, ease: 'easeOut' }}
         style={{
-          background: 'none',
-          border: 'none',
-          cursor: 'pointer',
-          color: '#C2185B',
-          fontSize: 20,
-          padding: 4,
+          width: '100%',
+          maxWidth: 398,
+          height: 56,
+          background: 'rgba(255,255,255,0.92)',
+          backdropFilter: 'blur(8px)',
+          border: '1px solid #F48FB1',
+          borderRadius: 9999,
           display: 'flex',
           alignItems: 'center',
+          padding: '0 12px',
+          gap: 10,
+          boxShadow: '0 4px 20px rgba(194,24,91,0.12)',
+          pointerEvents: 'auto',
         }}
       >
-        {playing ? '⏸' : '▶'}
-      </button>
-    </motion.div>
+        <span style={{ fontSize: 18, color: '#C2185B', flexShrink: 0 }}>♫</span>
+
+        <div className="flex-1 min-w-0">
+          <p
+            className="truncate"
+            style={{ fontFamily: 'Lato, sans-serif', fontSize: 13, color: '#3E2723' }}
+          >
+            {musicTitle} — {musicArtist}
+          </p>
+        </div>
+
+        <button
+          onClick={onTogglePlay}
+          style={{
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            color: '#C2185B',
+            fontSize: 20,
+            padding: 8,
+            display: 'flex',
+            alignItems: 'center',
+            flexShrink: 0,
+          }}
+        >
+          {isPlaying ? '⏸' : '▶'}
+        </button>
+      </motion.div>
+    </div>
   )
 }

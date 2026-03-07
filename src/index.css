@@ -31,6 +31,8 @@ html, body {
   font-family: 'Lato', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Evita scroll horizontal causado pelas polaroids rotacionadas */
+  overflow-x: hidden;
 }
 
 /* Container mobile-first: max 430px centralizado */
@@ -39,4 +41,5 @@ html, body {
   margin: 0 auto;
   min-height: 100vh;
   position: relative;
+  overflow-x: hidden;
 }
