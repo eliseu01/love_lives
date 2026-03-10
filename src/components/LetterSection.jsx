@@ -1,10 +1,19 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
-// Estados da animação do envelope
-// 'closed' → 'opening' → 'rising' → 'expanded'
+import envelopeClosed  from '../assets/envelope/envelope_closed.webp'
+import envelopeOpening from '../assets/envelope/envelope_opening.webp'
 
-export default function LetterSection({ letterText, onMusicStart }) {
+// Estados: 'closed' → 'opening' → 'expanded'
+
+const FADE = {
+  initial:    { opacity: 0, y: 12 },
+  animate:    { opacity: 1, y: 0  },
+  exit:       { opacity: 0, y: -12 },
+  transition: { duration: 0.35, ease: 'easeInOut' },
+}
+
+export default function LetterSection({ letterText, names, startDate, onMusicStart }) {
   const [stage, setStage] = useState('closed')
 
   function handleEnvelopeClick() {
@@ -12,9 +21,7 @@ export default function LetterSection({ letterText, onMusicStart }) {
     setStage('opening')
     onMusicStart?.()
 
-    // Sequência de animações
-    setTimeout(() => setStage('rising'), 700)
-    setTimeout(() => setStage('expanded'), 1300)
+    setTimeout(() => setStage('expanded'), 700)
   }
 
   return (
@@ -23,125 +30,198 @@ export default function LetterSection({ letterText, onMusicStart }) {
       style={{ background: '#FFF8F5' }}
     >
       <AnimatePresence mode="wait">
-        {/* ENVELOPE FECHADO */}
-        {(stage === 'closed' || stage === 'opening') && (
+
+        {/* ESTADO 1 — envelope fechado, pulso suave, clicável */}
+        {stage === 'closed' && (
           <motion.div
-            key="envelope"
-            className="flex flex-col items-center gap-4 cursor-pointer select-none w-full"
+            key="closed"
+            className="flex flex-col items-center gap-4 cursor-pointer select-none"
             onClick={handleEnvelopeClick}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ duration: 0.4 }}
+            {...FADE}
           >
-            <EnvelopeSVG isOpening={stage === 'opening'} />
-            {stage === 'closed' && (
-              <motion.p
-                className="text-sm"
-                style={{ fontFamily: 'Lato, sans-serif', color: '#F48FB1' }}
-                animate={{ opacity: [1, 0.5, 1] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
-              >
-                toque para abrir
-              </motion.p>
-            )}
+            <motion.img
+              src={envelopeClosed}
+              alt="envelope fechado"
+              style={{ width: '100%', maxWidth: 280 }}
+              animate={{ scale: [1, 1.03, 1] }}
+              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+            />
+            <motion.p
+              className="text-sm"
+              style={{ fontFamily: 'Lato, sans-serif', color: '#F48FB1' }}
+              animate={{ opacity: [1, 0.4, 1] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+            >
+              toque para abrir
+            </motion.p>
           </motion.div>
         )}
 
-        {/* CARTA SAINDO / EXPANDIDA */}
-        {(stage === 'rising' || stage === 'expanded') && (
+        {/* ESTADO 2 — envelope abrindo */}
+        {stage === 'opening' && (
+          <motion.img
+            key="opening"
+            src={envelopeOpening}
+            alt="envelope abrindo"
+            style={{ width: '100%', maxWidth: 280 }}
+            {...FADE}
+          />
+        )}
+
+        {/* ESTADO 3 — carta emerge do centro da tela */}
+        {stage === 'expanded' && (
           <motion.div
             key="letter"
             className="w-full flex justify-center"
-            initial={{ opacity: 0, y: 60 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: 'easeOut' }}
+            initial={{ opacity: 0, scale: 0.88, y: 24 }}
+            animate={{ opacity: 1, scale: 1,    y: 0  }}
+            transition={{ duration: 0.45, ease: 'easeOut' }}
           >
-            <LetterCard text={letterText} />
+            <LetterCard text={letterText} names={names} startDate={startDate} />
           </motion.div>
         )}
+
       </AnimatePresence>
     </section>
   )
 }
 
-function EnvelopeSVG({ isOpening }) {
-  return (
-    // width fluido — ocupa até 220px mas encolhe em telas menores
-    <div style={{ width: '100%', maxWidth: 220 }}>
-      <svg
-        viewBox="0 0 220 160"
-        fill="none"
-        style={{ width: '100%', height: 'auto', display: 'block' }}
-      >
-        {/* Corpo do envelope */}
-        <rect x="4" y="40" width="212" height="116" rx="6"
-          fill="#F5E6D3" stroke="#C2185B" strokeWidth="2" />
+function LetterCard({ text, names, startDate }) {
+  const parts = names ? names.split(' & ') : ['', '']
+  const from = parts[0] ?? ''
+  const to   = parts[1] ?? ''
 
-        {/* Aba inferior (dobra decorativa) */}
-        <path d="M4 156 L110 90 L216 156 Z" fill="#EDD5BE" />
+  const displayDate = startDate
+    ? new Date(startDate + 'T12:00:00').toLocaleDateString('pt-BR', {
+        day: '2-digit', month: '2-digit', year: 'numeric',
+      }).replace(/\//g, '.')
+    : ''
 
-        {/* Linhas diagonais (fechamento lateral) */}
-        <path d="M4 40 L110 100 L216 40" stroke="#C2185B" strokeWidth="1.5" strokeOpacity="0.4" />
+  const fontFamily = "'Caveat', cursive"
 
-        {/* Aba superior — gira quando isOpening */}
-        <motion.path
-          d="M4 40 L110 100 L216 40 L220 34 L0 34 Z"
-          fill="#F5E6D3"
-          stroke="#C2185B"
-          strokeWidth="2"
-          style={{ transformOrigin: '110px 40px' }}
-          animate={isOpening ? { rotateX: -160 } : { rotateX: 0 }}
-          transition={{ duration: 0.6, ease: 'easeInOut' }}
-        />
-
-        {/* Lacre coração */}
-        {!isOpening && (
-          <text x="110" y="108" textAnchor="middle" fontSize="28" fill="#C2185B">
-            ♥
-          </text>
-        )}
-      </svg>
-    </div>
-  )
-}
-
-function LetterCard({ text }) {
   return (
     <div
-      className="rounded-lg p-6"
       style={{
-        background: '#FFFDF9',
-        border: '1px solid #F0D9C8',
-        boxShadow: '0 8px 32px rgba(194,24,91,0.08)',
-        width: '90%',
+        display: 'flex',
+        justifyContent: 'center',
+        padding: '24px 16px',
       }}
     >
-      {/* Ornamento floral */}
-      <div className="text-center mb-3 text-2xl select-none" style={{ color: '#F48FB1' }}>
-        ❧
+      <div
+        style={{
+          position: 'relative',
+          width: '88%',
+          maxWidth: 360,
+          background: '#F5EDCC',
+          backgroundImage: `repeating-linear-gradient(
+            transparent,
+            transparent 27px,
+            rgba(180,140,60,0.08) 27px,
+            rgba(180,140,60,0.08) 28px
+          )`,
+          borderRadius: 4,
+          padding: '32px 28px 40px 28px',
+          transform: 'rotate(-1.5deg)',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.12), inset 0 0 60px rgba(180,140,60,0.06)',
+          fontFamily,
+          color: '#2C1A0E',
+          lineHeight: 1.75,
+        }}
+      >
+        {/* Dobra no canto superior direito */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            right: 0,
+            width: 0,
+            height: 0,
+            borderStyle: 'solid',
+            borderWidth: '0 24px 24px 0',
+            borderColor: 'transparent #e8d8a0 transparent transparent',
+            filter: 'drop-shadow(-2px 2px 2px rgba(0,0,0,0.1))',
+          }}
+        />
+
+        {/* De / Para */}
+        {(from || to) && (
+          <div
+            style={{
+              fontSize: 14,
+              fontFamily,
+              color: 'rgba(44,26,14,0.55)',
+              marginBottom: 22,
+              lineHeight: 1.6,
+              borderBottom: '1px dashed rgba(44,26,14,0.15)',
+              paddingBottom: 14,
+            }}
+          >
+            {from && <span style={{ display: 'block' }}>De: {from}</span>}
+            {to   && <span style={{ display: 'block' }}>Para: {to}</span>}
+          </div>
+        )}
+
+        {/* Saudação */}
+        {to && (
+          <span
+            style={{
+              display: 'block',
+              fontSize: 22,
+              fontWeight: 700,
+              fontFamily,
+              color: '#1a0e06',
+              marginBottom: 18,
+            }}
+          >
+            Para {to},
+          </span>
+        )}
+
+        {/* Corpo */}
+        <div
+          style={{
+            fontSize: 19,
+            fontWeight: 400,
+            fontFamily,
+            color: '#2C1A0E',
+            whiteSpace: 'pre-wrap',
+          }}
+        >
+          {text}
+        </div>
+
+        {/* Assinatura */}
+        {from && (
+          <div
+            style={{
+              marginTop: 24,
+              fontSize: 21,
+              fontWeight: 700,
+              fontFamily,
+              color: '#1a0e06',
+              textAlign: 'right',
+            }}
+          >
+            {from} ♡
+          </div>
+        )}
+
+        {/* Data */}
+        {displayDate && (
+          <div
+            style={{
+              fontSize: 14,
+              fontFamily,
+              fontStyle: 'italic',
+              color: 'rgba(44,26,14,0.5)',
+              textAlign: 'center',
+              marginTop: 20,
+            }}
+          >
+            {displayDate}
+          </div>
+        )}
       </div>
-
-      <h2
-        className="text-center text-xl mb-5"
-        style={{ fontFamily: 'Playfair Display, serif', color: '#C2185B' }}
-      >
-        Nossa História
-      </h2>
-
-      <p
-        className="whitespace-pre-line text-sm"
-        style={{ fontFamily: 'Lato, sans-serif', color: '#3E2723', lineHeight: 1.8 }}
-      >
-        {text}
-      </p>
-
-      <p
-        className="text-center text-xs italic mt-6"
-        style={{ fontFamily: 'Lato, sans-serif', color: '#F48FB1' }}
-      >
-        27.06.16
-      </p>
     </div>
   )
 }

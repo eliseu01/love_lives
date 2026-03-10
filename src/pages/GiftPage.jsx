@@ -100,6 +100,8 @@ export default function GiftPage() {
 
       <LetterSection
         letterText={data.letter_text}
+        names={data.names}
+        startDate={data.start_date}
         onMusicStart={handleMusicStart}
       />
 
