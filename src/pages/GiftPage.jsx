@@ -96,6 +96,7 @@ export default function GiftPage() {
         isPlaying={isPlaying}
         onTogglePlay={handleTogglePlay}
         visible={musicStarted}
+        coverSrc={data.photos?.[0]?.src}
       />
 
       <LetterSection
@@ -113,6 +114,7 @@ export default function GiftPage() {
         names={data.names}
         musicTitle={musicTitle}
         musicArtist={musicArtist}
+        coverPhoto={data.photos?.[0]?.src}
       />
     </div>
   )

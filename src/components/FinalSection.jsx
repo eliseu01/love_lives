@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 
-export default function FinalSection({ names, musicTitle, musicArtist }) {
+export default function FinalSection({ names, musicTitle, musicArtist, coverPhoto }) {
   function handleShare() {
     if (navigator.share) {
       navigator.share({
@@ -16,64 +16,100 @@ export default function FinalSection({ names, musicTitle, musicArtist }) {
 
   return (
     <section
-      className="min-h-screen flex flex-col items-center justify-between px-6 py-0"
-      style={{ background: '#C2185B', position: 'relative', overflow: 'hidden' }}
+      className="min-h-screen flex flex-col items-center px-6 py-16"
+      style={{
+        background: 'rgba(176, 23, 27, 0.97)',
+        position: 'relative',
+        overflow: 'hidden',
+      }}
     >
-      {/* Overlay escuro */}
-      <div
+      {/* LoveStory brand */}
+      <motion.h1
+        initial={{ opacity: 0, y: -16 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
         style={{
-          position: 'absolute',
-          inset: 0,
-          background: 'rgba(0,0,0,0.25)',
-          zIndex: 0,
+          fontFamily: 'Dancing Script, cursive',
+          fontWeight: 400,
+          fontSize: 'clamp(42px, 14vw, 58px)',
+          color: 'white',
+          letterSpacing: '0.02em',
+          textAlign: 'center',
+          lineHeight: 1.1,
+          marginBottom: 4,
         }}
-      />
+      >
+        LoveStory
+      </motion.h1>
 
-      <div className="relative z-10 flex flex-col items-center w-full py-14 gap-6">
-        {/* Ícone musical */}
-        <div className="flex flex-col items-center gap-1">
-          <span style={{ fontSize: 28, color: 'white' }}>♫</span>
+      {/* Names */}
+      <motion.p
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5, delay: 0.15 }}
+        style={{
+          fontFamily: 'Playfair Display, serif',
+          fontWeight: 700,
+          fontSize: 'clamp(18px, 5.5vw, 24px)',
+          color: 'white',
+          letterSpacing: '0.05em',
+          textAlign: 'center',
+          marginBottom: 36,
+        }}
+      >
+        {names}
+      </motion.p>
+
+      {/* Circular cover photo */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+        style={{
+          width: 'clamp(160px, 55vw, 220px)',
+          height: 'clamp(160px, 55vw, 220px)',
+          borderRadius: '50%',
+          overflow: 'hidden',
+          background: 'rgba(255,255,255,0.15)',
+          boxShadow: '0 8px 40px rgba(0,0,0,0.35)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: 56,
+          flexShrink: 0,
+          marginBottom: 36,
+        }}
+      >
+        {coverPhoto ? (
+          <img src={coverPhoto} alt={names} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        ) : (
+          '♥'
+        )}
+      </motion.div>
+
+      {/* Music info */}
+      {(musicTitle || musicArtist) && (
+        <div className="text-center" style={{ marginBottom: 24 }}>
           <p
             style={{
               fontFamily: 'Lato, sans-serif',
               fontSize: 10,
-              letterSpacing: '0.2em',
-              color: 'white',
+              letterSpacing: '0.18em',
+              color: 'rgba(255,255,255,0.6)',
               textTransform: 'uppercase',
+              marginBottom: 4,
             }}
           >
             tocando agora
           </p>
-        </div>
-
-        {/* Capa — placeholder coração (futuramente: foto do casal) */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          style={{
-            width: 'clamp(100px, 30vw, 120px)',
-            height: 'clamp(100px, 30vw, 120px)',
-            borderRadius: 8,
-            background: 'rgba(255,255,255,0.15)',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: 40,
-          }}
-        >
-          ♥
-        </motion.div>
-
-        {/* Nome da música */}
-        <div className="text-center">
           <p
             style={{
               fontFamily: 'Lato, sans-serif',
               fontWeight: 700,
-              fontSize: 20,
+              fontSize: 16,
               color: 'white',
             }}
           >
@@ -82,139 +118,37 @@ export default function FinalSection({ names, musicTitle, musicArtist }) {
           <p
             style={{
               fontFamily: 'Lato, sans-serif',
-              fontSize: 14,
+              fontSize: 13,
               color: 'rgba(255,255,255,0.7)',
             }}
           >
             {musicArtist}
           </p>
         </div>
+      )}
 
-        {/* Barra de progresso decorativa */}
-        <div className="w-4/5">
-          <div
-            style={{
-              height: 3,
-              borderRadius: 2,
-              background: 'rgba(255,255,255,0.2)',
-              position: 'relative',
-            }}
-          >
-            <div
-              style={{
-                width: '35%',
-                height: '100%',
-                background: 'rgba(255,255,255,0.8)',
-                borderRadius: 2,
-              }}
-            />
-            <div
-              style={{
-                position: 'absolute',
-                top: '50%',
-                left: '35%',
-                transform: 'translate(-50%, -50%)',
-                width: 10,
-                height: 10,
-                borderRadius: '50%',
-                background: 'white',
-              }}
-            />
-          </div>
-          <div
-            className="flex justify-between mt-1"
-            style={{ fontFamily: 'Lato, sans-serif', fontSize: 11, color: 'rgba(255,255,255,0.6)' }}
-          >
-            <span>1:24</span>
-            <span>4:21</span>
-          </div>
-        </div>
-
-        {/* Controles */}
-        <div className="flex items-center gap-6">
-          <button
-            style={{
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              color: 'rgba(255,255,255,0.7)',
-              fontSize: 20,
-              padding: '12px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            ⏮
-          </button>
-          <button
-            style={{
-              background: 'white',
-              border: 'none',
-              cursor: 'pointer',
-              width: 48,
-              height: 48,
-              borderRadius: '50%',
-              fontSize: 20,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#C2185B',
-            }}
-          >
-            ▶
-          </button>
-          <button
-            style={{
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              color: 'rgba(255,255,255,0.7)',
-              fontSize: 20,
-              padding: '12px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            ⏭
-          </button>
-        </div>
-
-        {/* Botão compartilhar */}
-        <button
-          onClick={handleShare}
-          className="flex items-center gap-2"
-          style={{
-            background: 'white',
-            color: '#C2185B',
-            border: 'none',
-            borderRadius: 24,
-            padding: '14px 24px',
-            fontFamily: 'Lato, sans-serif',
-            fontWeight: 700,
-            fontSize: 14,
-            cursor: 'pointer',
-            width: '80%',
-            justifyContent: 'center',
-            minHeight: 48,
-          }}
-        >
-          Compartilhar nos Stories ↗
-        </button>
-
-        {/* Assinatura */}
-        <p
-          style={{
-            fontFamily: 'Playfair Display, serif',
-            fontSize: 16,
-            color: 'rgba(255,255,255,0.6)',
-            fontStyle: 'italic',
-          }}
-        >
-          {names}
-        </p>
-      </div>
+      {/* Share button */}
+      <button
+        onClick={handleShare}
+        className="flex items-center gap-2"
+        style={{
+          background: 'white',
+          color: '#B0171B',
+          border: 'none',
+          borderRadius: 24,
+          padding: '14px 24px',
+          fontFamily: 'Lato, sans-serif',
+          fontWeight: 700,
+          fontSize: 14,
+          cursor: 'pointer',
+          width: '80%',
+          justifyContent: 'center',
+          minHeight: 48,
+          marginTop: 'auto',
+        }}
+      >
+        Compartilhar nos Stories ↗
+      </button>
     </section>
   )
 }

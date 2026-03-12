@@ -27,7 +27,7 @@ export default function LetterSection({ letterText, names, startDate, onMusicSta
   return (
     <section
       className="min-h-screen flex flex-col items-center justify-center px-6 py-16"
-      style={{ background: '#FFF8F5' }}
+      style={{ background: '#FCD7CE' }}
     >
       <AnimatePresence mode="wait">
 

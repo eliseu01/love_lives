@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:ital,wght@0,300;0,400;1,400&family=Dancing+Script:wght@400;600&family=Caveat:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:ital,wght@0,300;0,400;1,400&family=Dancing+Script:wght@400;600&family=Caveat:wght@400;600;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -21,11 +21,15 @@
 
 * {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+}
+
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 html, body {
+  margin: 0;
   background-color: #FFF8F5;
   color: #3E2723;
   font-family: 'Lato', system-ui, sans-serif;
