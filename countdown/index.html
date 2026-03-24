@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contador</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <p class="label-top">Estamos juntos há</p>
+
+    <div class="pill">
+      <div class="timer">
+        <div class="unit">
+          <span class="number" id="days">0000</span>
+          <span class="unit-label">dias</span>
+        </div>
+
+        <span class="separator">:</span>
+
+        <div class="unit">
+          <span class="number" id="hours">00</span>
+          <span class="unit-label">horas</span>
+        </div>
+
+        <span class="separator">:</span>
+
+        <div class="unit">
+          <span class="number" id="minutes">00</span>
+          <span class="unit-label">minutos</span>
+        </div>
+
+        <span class="separator">:</span>
+
+        <div class="unit">
+          <span class="number" id="seconds">00</span>
+          <span class="unit-label">segundos</span>
+        </div>
+      </div>
+    </div>
+
+    <p class="label-bottom">
+      <span class="heart">❤️</span>
+      Desde <span id="since-date"></span>
+    </p>
+
+    <script src="script.js"></script>
+  </body>
+</html>

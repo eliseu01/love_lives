@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import PaperTexture, { paperStyle } from './PaperTexture'
 
 // odd=-3deg, even=2.5deg, 3n=-1.5deg (espelha CSS nth-child)
 const ROTATIONS = [-3, 2.5, -1.5, 2.5, -3, -1.5, -3]
@@ -104,8 +105,9 @@ export default function GallerySection({ photos }) {
   return (
     <section
       className="py-4 pb-14 relative"
-      style={{ background: '#FCD7CE' }}
+      style={{ overflow: 'hidden', ...paperStyle }}
     >
+      <PaperTexture />
       <h2
         className="mb-10 mt-5"
         style={{

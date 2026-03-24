@@ -60,7 +60,7 @@ export default function GiftPage() {
     return (
       <div className="min-h-screen flex items-center justify-center"
         style={{ background: '#FFF8F5' }}>
-        <p style={{ fontFamily: 'Playfair Display, serif', color: '#C2185B', fontStyle: 'italic' }}>
+        <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: '#C2185B', fontStyle: 'italic' }}>
           carregando...
         </p>
       </div>
@@ -72,10 +72,10 @@ export default function GiftPage() {
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 px-8"
         style={{ background: '#FFF8F5' }}>
         <span style={{ fontSize: 48 }}>💔</span>
-        <p style={{ fontFamily: 'Playfair Display, serif', color: '#C2185B', fontSize: 20, textAlign: 'center' }}>
+        <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: '#C2185B', fontSize: 20, textAlign: 'center' }}>
           Este presente não foi encontrado.
         </p>
-        <p style={{ fontFamily: 'Lato, sans-serif', color: '#F48FB1', fontSize: 14, textAlign: 'center' }}>
+        <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: '#F48FB1', fontSize: 14, textAlign: 'center' }}>
           O link pode ter expirado ou estar incorreto.
         </p>
       </div>
@@ -115,6 +115,8 @@ export default function GiftPage() {
         musicTitle={musicTitle}
         musicArtist={musicArtist}
         coverPhoto={data.photos?.[0]?.src}
+        isPlaying={isPlaying}
+        onTogglePlay={handleTogglePlay}
       />
     </div>
   )

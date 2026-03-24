@@ -22,7 +22,7 @@ export default function App() {
                 alignItems: 'center',
                 justifyContent: 'center',
                 background: '#FFF8F5',
-                fontFamily: 'Playfair Display, serif',
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
                 color: '#C2185B',
                 fontSize: 20,
                 fontStyle: 'italic',

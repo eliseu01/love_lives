@@ -3,8 +3,22 @@ import { motion, AnimatePresence } from 'framer-motion'
 
 import envelopeClosed  from '../assets/envelope/envelope_closed.webp'
 import envelopeOpening from '../assets/envelope/envelope_opening.webp'
+import PaperTexture, { paperStyle } from './PaperTexture'
 
 // Estados: 'closed' → 'opening' → 'expanded'
+
+function getTimeLabel(startDate) {
+  if (!startDate) return ''
+  const diff = Date.now() - new Date(startDate).getTime()
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+  const years = Math.floor(days / 365)
+  const months = Math.floor((days % 365) / 30)
+
+  if (years > 0 && months > 0) return `há ${years} ano${years > 1 ? 's' : ''} e ${months} ${months > 1 ? 'meses' : 'mês'}`
+  if (years > 0) return `há ${years} ano${years > 1 ? 's' : ''}`
+  if (months > 0) return `há ${months} ${months > 1 ? 'meses' : 'mês'}`
+  return `há ${days} dia${days !== 1 ? 's' : ''}`
+}
 
 const FADE = {
   initial:    { opacity: 0, y: 12 },
@@ -27,8 +41,10 @@ export default function LetterSection({ letterText, names, startDate, onMusicSta
   return (
     <section
       className="min-h-screen flex flex-col items-center justify-center px-6 py-16"
-      style={{ background: '#FCD7CE' }}
+      style={{ position: 'relative', overflow: 'hidden', ...paperStyle }}
     >
+      <PaperTexture />
+      <div style={{ position: 'relative', zIndex: 1, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <AnimatePresence mode="wait">
 
         {/* ESTADO 1 — envelope fechado, pulso suave, clicável */}
@@ -39,6 +55,18 @@ export default function LetterSection({ letterText, names, startDate, onMusicSta
             onClick={handleEnvelopeClick}
             {...FADE}
           >
+            <p
+              style={{
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
+                fontSize: 'clamp(22px, 6vw, 28px)',
+                color: '#C2185B',
+                textAlign: 'center',
+                lineHeight: 1.4,
+                marginBottom: 4,
+              }}
+            >
+              {getTimeLabel(startDate)} eu te amo
+            </p>
             <motion.img
               src={envelopeClosed}
               alt="envelope fechado"
@@ -48,7 +76,7 @@ export default function LetterSection({ letterText, names, startDate, onMusicSta
             />
             <motion.p
               className="text-sm"
-              style={{ fontFamily: 'Lato, sans-serif', color: '#F48FB1' }}
+              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: '#F48FB1' }}
               animate={{ opacity: [1, 0.4, 1] }}
               transition={{ duration: 1.5, repeat: Infinity }}
             >
@@ -82,6 +110,7 @@ export default function LetterSection({ letterText, names, startDate, onMusicSta
         )}
 
       </AnimatePresence>
+      </div>
     </section>
   )
 }

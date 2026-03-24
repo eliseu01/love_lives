@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import PaperTexture, { paperStyle } from './PaperTexture'
 
 // Corações que flutuam de baixo para cima
 const HEARTS = [
@@ -39,10 +40,11 @@ export default function LoadingSection({ onDone }) {
         <motion.div
           key="loading"
           className="fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden"
-          style={{ background: 'linear-gradient(180deg, #FFF0F3 0%, #FFE4EC 100%)' }}
+          style={{ ...paperStyle }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
         >
+          <PaperTexture />
           {/* Corações flutuantes */}
           {HEARTS.map((h) => (
             <FloatingHeart key={h.id} {...h} />
@@ -59,7 +61,7 @@ export default function LoadingSection({ onDone }) {
 
           <p
             className="text-sm italic"
-            style={{ fontFamily: 'Playfair Display, serif', color: '#C2185B' }}
+            style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: '#C2185B' }}
           >
             carregando algo especial...
           </p>

@@ -63,7 +63,7 @@ export default function FloatingPlayer({ musicTitle, musicArtist, isPlaying, onT
           <p
             className="truncate"
             style={{
-              fontFamily: 'Lato, sans-serif',
+              fontFamily: "'Plus Jakarta Sans', sans-serif",
               fontWeight: 700,
               fontSize: 13,
               color: '#000000',
@@ -75,7 +75,7 @@ export default function FloatingPlayer({ musicTitle, musicArtist, isPlaying, onT
           <p
             className="truncate"
             style={{
-              fontFamily: 'Lato, sans-serif',
+              fontFamily: "'Plus Jakarta Sans', sans-serif",
               fontSize: 12,
               color: '#555555',
               lineHeight: 1.3,
