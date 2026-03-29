@@ -1,6 +1,225 @@
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 
 const PJS = "'Plus Jakarta Sans', sans-serif"
+
+/* ── Share image — Canvas API ───────────────────────────────────── */
+
+function loadImg(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => resolve(img)
+    img.onerror = reject
+    img.src = src
+  })
+}
+
+function drawPlay(ctx, cx, cy, r, color) {
+  ctx.fillStyle = color
+  ctx.beginPath()
+  ctx.moveTo(cx - r * 0.38, cy - r * 0.52)
+  ctx.lineTo(cx + r * 0.56, cy)
+  ctx.lineTo(cx - r * 0.38, cy + r * 0.52)
+  ctx.closePath()
+  ctx.fill()
+}
+
+function drawPause(ctx, cx, cy, r, color) {
+  ctx.fillStyle = color
+  const bw = r * 0.26, bh = r * 0.58, gap = r * 0.18
+  ctx.fillRect(cx - gap - bw, cy - bh, bw, bh * 2)
+  ctx.fillRect(cx + gap,       cy - bh, bw, bh * 2)
+}
+
+function drawPrev(ctx, cx, cy, s, color) {
+  ctx.fillStyle = color
+  ctx.fillRect(cx - s * 0.9, cy - s * 0.7, s * 0.2, s * 1.4)
+  ctx.beginPath()
+  ctx.moveTo(cx + s * 0.5, cy - s * 0.7)
+  ctx.lineTo(cx - s * 0.6, cy)
+  ctx.lineTo(cx + s * 0.5, cy + s * 0.7)
+  ctx.closePath()
+  ctx.fill()
+  ctx.beginPath()
+  ctx.moveTo(cx - s * 0.05, cy - s * 0.7)
+  ctx.lineTo(cx - s * 1.15, cy)
+  ctx.lineTo(cx - s * 0.05, cy + s * 0.7)
+  ctx.closePath()
+  ctx.fill()
+}
+
+function drawNext(ctx, cx, cy, s, color) {
+  ctx.fillStyle = color
+  ctx.fillRect(cx + s * 0.7, cy - s * 0.7, s * 0.2, s * 1.4)
+  ctx.beginPath()
+  ctx.moveTo(cx - s * 0.5, cy - s * 0.7)
+  ctx.lineTo(cx + s * 0.6, cy)
+  ctx.lineTo(cx - s * 0.5, cy + s * 0.7)
+  ctx.closePath()
+  ctx.fill()
+  ctx.beginPath()
+  ctx.moveTo(cx + s * 0.05, cy - s * 0.7)
+  ctx.lineTo(cx + s * 1.15, cy)
+  ctx.lineTo(cx + s * 0.05, cy + s * 0.7)
+  ctx.closePath()
+  ctx.fill()
+}
+
+function drawShuffle(ctx, cx, cy, s, color) {
+  // Dois traços cruzados com setas
+  ctx.strokeStyle = color
+  ctx.lineWidth = s * 0.18
+  ctx.lineCap = 'round'
+  // linha de cima: esquerda-baixo → direita-cima
+  ctx.beginPath()
+  ctx.moveTo(cx - s, cy + s * 0.5)
+  ctx.bezierCurveTo(cx - s * 0.2, cy + s * 0.5, cx + s * 0.2, cy - s * 0.5, cx + s, cy - s * 0.5)
+  ctx.stroke()
+  // linha de baixo: esquerda-cima → direita-baixo
+  ctx.beginPath()
+  ctx.moveTo(cx - s, cy - s * 0.5)
+  ctx.bezierCurveTo(cx - s * 0.2, cy - s * 0.5, cx + s * 0.2, cy + s * 0.5, cx + s, cy + s * 0.5)
+  ctx.stroke()
+  // seta cima-direita
+  ctx.beginPath()
+  ctx.moveTo(cx + s * 0.62, cy - s * 0.85)
+  ctx.lineTo(cx + s, cy - s * 0.5)
+  ctx.lineTo(cx + s * 0.62, cy - s * 0.15)
+  ctx.stroke()
+  // seta baixo-direita
+  ctx.beginPath()
+  ctx.moveTo(cx + s * 0.62, cy + s * 0.15)
+  ctx.lineTo(cx + s, cy + s * 0.5)
+  ctx.lineTo(cx + s * 0.62, cy + s * 0.85)
+  ctx.stroke()
+}
+
+function drawRepeat(ctx, cx, cy, s, color) {
+  ctx.strokeStyle = color
+  ctx.lineWidth = s * 0.18
+  ctx.lineCap = 'round'
+  ctx.lineJoin = 'round'
+  // arco superior
+  ctx.beginPath()
+  ctx.moveTo(cx - s * 0.4, cy - s * 0.6)
+  ctx.lineTo(cx + s * 0.5, cy - s * 0.6)
+  ctx.arcTo(cx + s, cy - s * 0.6, cx + s, cy, s * 0.5)
+  ctx.lineTo(cx + s, cy + s * 0.3)
+  ctx.stroke()
+  // arco inferior
+  ctx.beginPath()
+  ctx.moveTo(cx + s * 0.4, cy + s * 0.6)
+  ctx.lineTo(cx - s * 0.5, cy + s * 0.6)
+  ctx.arcTo(cx - s, cy + s * 0.6, cx - s, cy, s * 0.5)
+  ctx.lineTo(cx - s, cy - s * 0.3)
+  ctx.stroke()
+  // seta cima-esquerda
+  ctx.beginPath()
+  ctx.moveTo(cx - s * 0.04, cy - s * 0.95)
+  ctx.lineTo(cx - s * 0.4, cy - s * 0.6)
+  ctx.lineTo(cx - s * 0.04, cy - s * 0.25)
+  ctx.stroke()
+  // seta baixo-direita
+  ctx.beginPath()
+  ctx.moveTo(cx + s * 0.04, cy + s * 0.95)
+  ctx.lineTo(cx + s * 0.4, cy + s * 0.6)
+  ctx.lineTo(cx + s * 0.04, cy + s * 0.25)
+  ctx.stroke()
+}
+
+async function buildShareCanvas({ coverPhoto, musicTitle, musicArtist, isPlaying }) {
+  await document.fonts.ready
+
+  const W = 1080
+  const H = 1920
+  const canvas = document.createElement('canvas')
+  canvas.width = W
+  canvas.height = H
+  const ctx = canvas.getContext('2d')
+
+  // Fundo escuro
+  ctx.fillStyle = '#111111'
+  ctx.fillRect(0, 0, W, H)
+
+  // Foto de capa — cobre toda a tela
+  if (coverPhoto) {
+    try {
+      const img = await loadImg(coverPhoto)
+      const scale = Math.max(W / img.width, H / img.height)
+      const dw = img.width * scale
+      const dh = img.height * scale
+      ctx.drawImage(img, (W - dw) / 2, (H - dh) / 2, dw, dh)
+    } catch { /* sem foto */ }
+  }
+
+  // Overlay escuro progressivo — fundo da tela mais opaco
+  const overlay = ctx.createLinearGradient(0, 0, 0, H)
+  overlay.addColorStop(0,   'rgba(0,0,0,0.25)')
+  overlay.addColorStop(0.45,'rgba(0,0,0,0.35)')
+  overlay.addColorStop(0.72,'rgba(0,0,0,0.82)')
+  overlay.addColorStop(1,   'rgba(0,0,0,0.97)')
+  ctx.fillStyle = overlay
+  ctx.fillRect(0, 0, W, H)
+
+  // Padding lateral
+  const padX = 88
+
+  // Nome da música — alinhado à esquerda
+  ctx.fillStyle = '#ffffff'
+  ctx.textAlign = 'left'
+  ctx.textBaseline = 'alphabetic'
+  ctx.font = `800 86px 'Plus Jakarta Sans', sans-serif`
+  const maxW = W - padX * 2 - 80
+  let title = musicTitle || 'Nossa Música'
+  while (ctx.measureText(title).width > maxW && title.length > 4) title = title.slice(0, -1)
+  if (title !== (musicTitle || 'Nossa Música')) title += '…'
+  ctx.fillText(title, padX, H * 0.725)
+
+  // Artista — alinhado à esquerda
+  ctx.fillStyle = 'rgba(255,255,255,0.65)'
+  ctx.font = `500 52px 'Plus Jakarta Sans', sans-serif`
+  let artist = musicArtist || ''
+  while (ctx.measureText(artist).width > maxW && artist.length > 4) artist = artist.slice(0, -1)
+  if (artist !== (musicArtist || '')) artist += '…'
+  ctx.fillText(artist, padX, H * 0.725 + 80)
+
+  // Controles — 5 botões: shuffle | prev | play | next | repeat
+  const ctrlY = H * 0.865
+  const playR = 88
+  const iconS = 42
+
+  // Espaçamento: distribuído em [padX … W-padX]
+  const xs = {
+    shuffle: padX + 30,
+    prev:    W / 2 - 210,
+    play:    W / 2,
+    next:    W / 2 + 210,
+    repeat:  W - padX - 30,
+  }
+
+  // Play/Pause — círculo branco
+  ctx.fillStyle = 'white'
+  ctx.beginPath()
+  ctx.arc(xs.play, ctrlY, playR, 0, Math.PI * 2)
+  ctx.fill()
+
+  if (isPlaying) {
+    drawPause(ctx, xs.play, ctrlY, playR, '#111111')
+  } else {
+    drawPlay(ctx, xs.play, ctrlY, playR, '#111111')
+  }
+
+  // Prev / Next
+  drawPrev(ctx, xs.prev, ctrlY, iconS, 'white')
+  drawNext(ctx, xs.next, ctrlY, iconS, 'white')
+
+  // Shuffle / Repeat
+  drawShuffle(ctx, xs.shuffle, ctrlY, iconS * 0.75, 'rgba(255,255,255,0.7)')
+  drawRepeat( ctx, xs.repeat,  ctrlY, iconS * 0.75, 'rgba(255,255,255,0.7)')
+
+  return canvas
+}
 
 function IconShuffle() {
   return (
@@ -60,16 +279,29 @@ function IconPause() {
 }
 
 export default function FinalSection({ names, musicTitle, musicArtist, coverPhoto, isPlaying, onTogglePlay }) {
-  function handleShare() {
-    if (navigator.share) {
-      navigator.share({
-        title: `${names} — nossa história`,
-        text: 'Vem ver algo especial ♥',
-        url: window.location.href,
-      }).catch(() => {})
-    } else {
-      navigator.clipboard?.writeText(window.location.href)
-      alert('Link copiado!')
+  const [sharing, setSharing] = useState(false)
+
+  async function handleShare() {
+    setSharing(true)
+    try {
+      const canvas = await buildShareCanvas({ coverPhoto, musicTitle, musicArtist, isPlaying })
+      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'))
+      const file = new File([blob], 'nossa-historia.png', { type: 'image/png' })
+
+      if (navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ files: [file] })
+      } else {
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = 'nossa-historia.png'
+        a.click()
+        URL.revokeObjectURL(url)
+      }
+    } catch (err) {
+      if (err?.name !== 'AbortError') console.error(err)
+    } finally {
+      setSharing(false)
     }
   }
 
@@ -324,7 +556,7 @@ export default function FinalSection({ names, musicTitle, musicArtist, coverPhot
             letterSpacing: '-0.01em',
           }}
         >
-          Compartilhar nos Stories ↗
+          {sharing ? 'Gerando imagem…' : 'Compartilhar nos Stories ↗'}
         </button>
       </motion.div>
     </section>
