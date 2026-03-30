@@ -1,15 +1,31 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import GiftPage from './pages/GiftPage'
+import LoginPage from './pages/LoginPage'
+import EditorPage from './pages/EditorPage'
+import DashboardPage from './pages/DashboardPage'
+import ProtectedRoute from './components/ProtectedRoute'
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Rota principal: /p/:slug */}
+        {/* Rotas públicas (já existentes) */}
         <Route path="/p/:slug" element={<GiftPage />} />
-
-        {/* Rota de dev: /dev carrega dados de exemplo */}
         <Route path="/dev" element={<Navigate to="/p/dev" replace />} />
+
+        {/* Auth */}
+        <Route path="/login" element={<LoginPage />} />
+
+        {/* Rotas protegidas */}
+        <Route path="/meus-presentes" element={
+          <ProtectedRoute><DashboardPage /></ProtectedRoute>
+        } />
+        <Route path="/criar" element={
+          <ProtectedRoute><EditorPage /></ProtectedRoute>
+        } />
+        <Route path="/editar/:slug" element={
+          <ProtectedRoute><EditorPage /></ProtectedRoute>
+        } />
 
         {/* Rota raiz: placeholder */}
         <Route
