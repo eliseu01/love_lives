@@ -3,6 +3,8 @@ import GiftPage from './pages/GiftPage'
 import LoginPage from './pages/LoginPage'
 import EditorPage from './pages/EditorPage'
 import DashboardPage from './pages/DashboardPage'
+import LandingPage from './pages/LandingPage'
+import PaymentResultPage from './pages/PaymentResultPage'
 import ProtectedRoute from './components/ProtectedRoute'
 
 export default function App() {
@@ -27,27 +29,13 @@ export default function App() {
           <ProtectedRoute><EditorPage /></ProtectedRoute>
         } />
 
-        {/* Rota raiz: placeholder */}
-        <Route
-          path="/"
-          element={
-            <div
-              style={{
-                minHeight: '100vh',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                background: '#FFF8F5',
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-                color: '#C2185B',
-                fontSize: 20,
-                fontStyle: 'italic',
-              }}
-            >
-              LoveStory ♥
-            </div>
-          }
-        />
+        {/* Retorno do pagamento */}
+        <Route path="/pagamento/sucesso" element={<PaymentResultPage status="success" />} />
+        <Route path="/pagamento/erro" element={<PaymentResultPage status="failure" />} />
+        <Route path="/pagamento/pendente" element={<PaymentResultPage status="pending" />} />
+
+        {/* Landing page */}
+        <Route path="/" element={<LandingPage />} />
       </Routes>
     </BrowserRouter>
   )

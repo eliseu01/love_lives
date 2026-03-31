@@ -59,6 +59,22 @@ export default function DashboardPage() {
     setGifts(prev => prev.filter(g => g.slug !== gift.slug))
   }
 
+  async function handlePayNow(gift) {
+    try {
+      const response = await fetch('/api/create-preference', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ gift_id: gift.id }),
+      })
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.error || 'Erro ao criar pagamento')
+      const mpEnv = import.meta.env.VITE_MP_ENV || 'sandbox'
+      window.location.href = mpEnv === 'production' ? data.init_point : data.sandbox_init_point
+    } catch (err) {
+      alert(err.message)
+    }
+  }
+
   async function handleSignOut() {
     await signOut()
     navigate('/login')
@@ -227,22 +243,86 @@ export default function DashboardPage() {
 
                 {/* Ações */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6, flexShrink: 0 }}>
-                  <button
-                    onClick={() => navigate(`/editar/${gift.slug}`)}
-                    style={{
-                      padding: '7px 14px',
-                      fontFamily: PJS,
-                      fontWeight: 600,
-                      fontSize: 12,
-                      color: COLORS.primary,
-                      background: 'transparent',
-                      border: `1px solid ${COLORS.primary}`,
-                      borderRadius: 20,
-                      cursor: 'pointer',
-                    }}
-                  >
-                    Editar
-                  </button>
+                  {gift.status === 'paid' ? (
+                    <>
+                      <span style={{
+                        padding: '3px 10px',
+                        fontFamily: PJS,
+                        fontWeight: 700,
+                        fontSize: 11,
+                        color: '#2e7d32',
+                        background: '#e8f5e9',
+                        borderRadius: 20,
+                        textAlign: 'center',
+                      }}>
+                        Ativo
+                      </span>
+                      <button
+                        onClick={() => navigate(`/editar/${gift.slug}`)}
+                        style={{
+                          padding: '7px 14px',
+                          fontFamily: PJS,
+                          fontWeight: 600,
+                          fontSize: 12,
+                          color: COLORS.primary,
+                          background: 'transparent',
+                          border: `1px solid ${COLORS.primary}`,
+                          borderRadius: 20,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Editar
+                      </button>
+                      <button
+                        onClick={() => navigate(`/p/${gift.slug}`)}
+                        style={{
+                          padding: '7px 14px',
+                          fontFamily: PJS,
+                          fontWeight: 600,
+                          fontSize: 12,
+                          color: COLORS.muted,
+                          background: 'transparent',
+                          border: `1px solid ${COLORS.border}`,
+                          borderRadius: 20,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Ver
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <span style={{
+                        padding: '3px 10px',
+                        fontFamily: PJS,
+                        fontWeight: 700,
+                        fontSize: 10,
+                        color: '#e65100',
+                        background: '#fff3e0',
+                        borderRadius: 20,
+                        textAlign: 'center',
+                        lineHeight: 1.4,
+                      }}>
+                        Aguardando pagamento
+                      </span>
+                      <button
+                        onClick={() => handlePayNow(gift)}
+                        style={{
+                          padding: '7px 14px',
+                          fontFamily: PJS,
+                          fontWeight: 700,
+                          fontSize: 12,
+                          color: '#ffffff',
+                          background: COLORS.primary,
+                          border: 'none',
+                          borderRadius: 20,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Pagar agora
+                      </button>
+                    </>
+                  )}
                   <button
                     onClick={() => handleDelete(gift)}
                     style={{

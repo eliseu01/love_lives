@@ -713,19 +713,33 @@ export default function EditorPage() {
       }
 
       if (isEditing) {
+        // Edição: salva e mostra tela de sucesso (sem novo pagamento)
         const { error: dbError } = await supabase
           .from('gifts')
           .update(payload)
           .eq('slug', form.slug)
         if (dbError) throw dbError
+        setPublishedSlug(form.slug)
       } else {
-        const { error: dbError } = await supabase
+        // Criação: insere como draft e redireciona para pagamento
+        const { data: gift, error: dbError } = await supabase
           .from('gifts')
-          .insert({ ...payload, slug: form.slug })
+          .insert({ ...payload, slug: form.slug, status: 'draft' })
+          .select('id')
+          .single()
         if (dbError) throw dbError
-      }
 
-      setPublishedSlug(form.slug)
+        const response = await fetch('/api/create-preference', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ gift_id: gift.id }),
+        })
+        const data = await response.json()
+        if (!response.ok) throw new Error(data.error || 'Erro ao criar pagamento')
+
+        const mpEnv = import.meta.env.VITE_MP_ENV || 'sandbox'
+        window.location.href = mpEnv === 'production' ? data.init_point : data.sandbox_init_point
+      }
     } catch (err) {
       setError(err.message)
       setSaving(false)
