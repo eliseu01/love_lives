@@ -41,6 +41,7 @@ export default async function handler(req, res) {
     const protocol = req.headers['x-forwarded-proto'] || 'https'
     const host = req.headers['x-forwarded-host'] || req.headers.host
     const baseUrl = `${protocol}://${host}`
+    const isLocalhost = host.startsWith('localhost') || host.startsWith('127.0.0.1')
 
     // Criar preferência no Mercado Pago
     const preference = new Preference(mp)
@@ -60,7 +61,8 @@ export default async function handler(req, res) {
           failure: `${baseUrl}/pagamento/erro?slug=${gift.slug}`,
           pending: `${baseUrl}/pagamento/pendente?slug=${gift.slug}`,
         },
-        auto_return: 'approved',
+        // auto_return exige URLs públicas — desativado em localhost
+        ...(!isLocalhost && { auto_return: 'approved' }),
         external_reference: gift.id,
         notification_url: `${baseUrl}/api/webhook`,
         payment_methods: {

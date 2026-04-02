@@ -27,3 +27,6 @@ payment_implementation_guide.md
 *.njsproj
 *.sln
 *.sw?
+
+.vercel
+.env*.local
