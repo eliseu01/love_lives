@@ -61,9 +61,13 @@ export default function DashboardPage() {
 
   async function handlePayNow(gift) {
     try {
+      const { data: { session } } = await supabase.auth.getSession()
       const response = await fetch('/api/create-preference', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.access_token}`,
+        },
         body: JSON.stringify({ gift_id: gift.id }),
       })
       const data = await response.json()

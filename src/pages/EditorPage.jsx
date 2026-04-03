@@ -633,6 +633,7 @@ export default function EditorPage() {
       .from('gifts')
       .select('*')
       .eq('slug', slug)
+      .eq('user_id', user.id)
       .single()
       .then(({ data, error: fetchError }) => {
         if (fetchError || !data) { navigate('/meus-presentes'); return }
@@ -729,9 +730,13 @@ export default function EditorPage() {
           .single()
         if (dbError) throw dbError
 
+        const { data: { session } } = await supabase.auth.getSession()
         const response = await fetch('/api/create-preference', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session?.access_token}`,
+          },
           body: JSON.stringify({ gift_id: gift.id }),
         })
         const data = await response.json()
