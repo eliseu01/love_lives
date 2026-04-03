@@ -41,8 +41,7 @@ function verifyWebhookSignature(req) {
   if (!ts || !hash) return false
 
   // Obter data.id da query string
-  const url = new URL(req.url, `https://${req.headers.host}`)
-  const dataId = url.searchParams.get('data.id') || req.body?.data?.id || ''
+  const dataId = req.query?.['data.id'] || req.body?.data?.id || ''
 
   // Montar o template e calcular HMAC
   const signatureTemplate = `id:${dataId};request-id:${xRequestId};ts:${ts};`
