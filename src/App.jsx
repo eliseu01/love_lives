@@ -6,7 +6,7 @@ import DashboardPage from './pages/DashboardPage'
 import LandingPage from './pages/LandingPage'
 import PaymentResultPage from './pages/PaymentResultPage'
 import ProtectedRoute from './components/ProtectedRoute'
-import { Analytics } from "@vercel/analytics/next"
+import { Analytics } from "@vercel/analytics/react"
 
 export default function App() {
   return (
