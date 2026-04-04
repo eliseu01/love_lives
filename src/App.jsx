@@ -10,34 +10,37 @@ import { Analytics } from "@vercel/analytics/react"
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Rotas públicas (já existentes) */}
-        <Route path="/p/:slug" element={<GiftPage />} />
-        <Route path="/dev" element={<Navigate to="/p/dev" replace />} />
+    <>
+      <BrowserRouter>
+        <Routes>
+          {/* Rotas públicas (já existentes) */}
+          <Route path="/p/:slug" element={<GiftPage />} />
+          <Route path="/dev" element={<Navigate to="/p/dev" replace />} />
 
-        {/* Auth */}
-        <Route path="/login" element={<LoginPage />} />
+          {/* Auth */}
+          <Route path="/login" element={<LoginPage />} />
 
-        {/* Rotas protegidas */}
-        <Route path="/meus-presentes" element={
-          <ProtectedRoute><DashboardPage /></ProtectedRoute>
-        } />
-        <Route path="/criar" element={
-          <ProtectedRoute><EditorPage /></ProtectedRoute>
-        } />
-        <Route path="/editar/:slug" element={
-          <ProtectedRoute><EditorPage /></ProtectedRoute>
-        } />
+          {/* Rotas protegidas */}
+          <Route path="/meus-presentes" element={
+            <ProtectedRoute><DashboardPage /></ProtectedRoute>
+          } />
+          <Route path="/criar" element={
+            <ProtectedRoute><EditorPage /></ProtectedRoute>
+          } />
+          <Route path="/editar/:slug" element={
+            <ProtectedRoute><EditorPage /></ProtectedRoute>
+          } />
 
-        {/* Retorno do pagamento */}
-        <Route path="/pagamento/sucesso" element={<PaymentResultPage status="success" />} />
-        <Route path="/pagamento/erro" element={<PaymentResultPage status="failure" />} />
-        <Route path="/pagamento/pendente" element={<PaymentResultPage status="pending" />} />
+          {/* Retorno do pagamento */}
+          <Route path="/pagamento/sucesso" element={<PaymentResultPage status="success" />} />
+          <Route path="/pagamento/erro" element={<PaymentResultPage status="failure" />} />
+          <Route path="/pagamento/pendente" element={<PaymentResultPage status="pending" />} />
 
-        {/* Landing page */}
-        <Route path="/" element={<LandingPage />} />
-      </Routes>
-    </BrowserRouter>
+          {/* Landing page */}
+          <Route path="/" element={<LandingPage />} />
+        </Routes>
+      </BrowserRouter>
+      <Analytics />
+    </>
   )
 }
