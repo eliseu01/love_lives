@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
+import QRCode from 'qrcode'
 
 const PJS = "'Plus Jakarta Sans', sans-serif"
 const COLORS = {
@@ -39,12 +40,53 @@ export default function PaymentResultPage({ status }) {
   const url = slug ? `${window.location.origin}/p/${slug}` : null
   const config = STATUS_CONFIG[status] ?? STATUS_CONFIG.failure
 
+  const qrCanvasRef = useRef(null)
+
+  useEffect(() => {
+    if (status === 'success' && url && qrCanvasRef.current) {
+      QRCode.toCanvas(qrCanvasRef.current, url, {
+        width: 200,
+        margin: 2,
+        color: {
+          dark: '#3E2723',
+          light: '#ffffff',
+        },
+      })
+    }
+  }, [status, url])
+
   function copyLink() {
     if (!url) return
     navigator.clipboard.writeText(url).then(() => {
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     })
+  }
+
+  async function shareQR() {
+    if (!qrCanvasRef.current) return
+    try {
+      const blob = await new Promise(resolve =>
+        qrCanvasRef.current.toBlob(resolve, 'image/png')
+      )
+      const file = new File([blob], `lovestory-${slug}.png`, { type: 'image/png' })
+
+      if (navigator.canShare?.({ files: [file] })) {
+        await navigator.share({
+          title: 'LoveStory — QR Code do presente',
+          text: `Escaneie para abrir o presente: ${url}`,
+          files: [file],
+        })
+      } else {
+        const link = document.createElement('a')
+        link.href = URL.createObjectURL(blob)
+        link.download = `lovestory-${slug}.png`
+        link.click()
+        URL.revokeObjectURL(link.href)
+      }
+    } catch (err) {
+      if (err.name !== 'AbortError') console.error(err)
+    }
   }
 
   return (
@@ -90,7 +132,7 @@ export default function PaymentResultPage({ status }) {
           {config.subtitle}
         </p>
 
-        {/* Sucesso: mostrar link + botões */}
+        {/* Sucesso: mostrar link + QR Code + botões */}
         {status === 'success' && url && (
           <>
             <div style={{
@@ -107,6 +149,42 @@ export default function PaymentResultPage({ status }) {
               boxSizing: 'border-box',
             }}>
               {url}
+            </div>
+
+            {/* QR Code */}
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 12,
+              padding: '20px 0',
+            }}>
+              <canvas
+                ref={qrCanvasRef}
+                style={{
+                  borderRadius: 12,
+                  boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
+                }}
+              />
+              <button
+                onClick={shareQR}
+                style={{
+                  fontFamily: PJS,
+                  fontWeight: 600,
+                  fontSize: 13,
+                  color: COLORS.muted,
+                  background: 'transparent',
+                  border: `1px solid ${COLORS.border}`,
+                  borderRadius: 20,
+                  padding: '8px 20px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                }}
+              >
+                📤 Compartilhar QR Code
+              </button>
             </div>
 
             <button

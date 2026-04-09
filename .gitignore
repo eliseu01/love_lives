@@ -17,6 +17,7 @@ editor_implementation_guide.md
 landing_implementation_guide.md
 payment_implementation_guide.md
 security_fixes_guide.md
+qrcode_implementation_guide.md
 
 # Editor directories and files
 .vscode/*
