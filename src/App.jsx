@@ -7,6 +7,7 @@ import LandingPage from './pages/LandingPage'
 import PaymentResultPage from './pages/PaymentResultPage'
 import ProtectedRoute from './components/ProtectedRoute'
 import { Analytics } from "@vercel/analytics/react"
+import { SpeedInsights } from "@vercel/speed-insights/react"
 
 export default function App() {
   return (
@@ -41,6 +42,7 @@ export default function App() {
         </Routes>
       </BrowserRouter>
       <Analytics />
+      <SpeedInsights />
     </>
   )
 }
