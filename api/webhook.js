@@ -98,24 +98,31 @@ export default async function handler(req, res) {
       return res.status(200).json({ ok: true })
     }
 
-    // 5. Atualizar o presente para 'paid'
-    const { data: updatedGift, error: updateError } = await supabase
+    console.log(`Webhook: processando gift_id=${giftId}, payment_id=${paymentId}`)
+
+    // 5. Atualizar o presente para 'paid' (sem .single() para manter idempotência)
+    const { error: updateError } = await supabase
       .from('gifts')
       .update({
         status: 'paid',
         mp_payment_id: String(paymentId),
       })
       .eq('id', giftId)
-      .eq('status', 'draft') // só atualiza se ainda for draft (idempotente)
-      .select('edition')
-      .single()
+      .eq('status', 'draft') // não atualiza se já estiver paid (idempotente)
 
     if (updateError) {
       console.error('Erro ao atualizar presente:', updateError)
       return res.status(500).json({ error: 'Erro ao atualizar' })
     }
 
-    console.log(`Pagamento confirmado: gift ${giftId}, edition ${updatedGift?.edition}`)
+    // Buscar edition para log sem .single() (não quebra se gift não existir)
+    const { data: gift } = await supabase
+      .from('gifts')
+      .select('edition, status')
+      .eq('id', giftId)
+      .maybeSingle()
+
+    console.log(`Pagamento processado: gift ${giftId}, edition ${gift?.edition}, status=${gift?.status}`)
     return res.status(200).json({ ok: true, status: 'paid' })
 
   } catch (error) {

@@ -84,7 +84,7 @@ O projeto roda em duas instâncias Vercel a partir do mesmo repo Git:
 - `lovestorybr.com` — projeto Vercel `lovestory`, `VITE_EDITION=valentines`
 - `maes.lovestorybr.com` — projeto Vercel `lovestory-maes`, `VITE_EDITION=mothers-day`
 
-Ambos compartilham Supabase, conta MP, e webhook (configurado em `lovestorybr.com/api/webhook`). A edição é gravada na criação do presente e usada como filtro em todas as queries. O frontend envia `return_url_base` (via `getEditionUrl`) no body do `/api/create-preference`; o backend valida contra `ALLOWED_URLS` antes de usar nas `back_urls` do MP.
+Ambos compartilham Supabase, conta MP, e webhook (configurado em `www.lovestorybr.com/api/webhook`). A edição é gravada na criação do presente e usada como filtro em todas as queries. O frontend envia `return_url_base` (via `getEditionUrl`) no body do `/api/create-preference`; o backend valida contra `ALLOWED_URLS` antes de usar nas `back_urls` do MP.
 
 Para criar uma nova edição futura:
 1. Adicionar `src/editions/{id}/` com `config.js`, assets, decoration.
