@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import QRCode from 'qrcode'
+import { supabase } from '../lib/supabase'
 
 const PJS = "'Plus Jakarta Sans', sans-serif"
 const COLORS = {
@@ -27,8 +28,8 @@ const STATUS_CONFIG = {
   pending: {
     icon: '⏳',
     iconColor: '#e67e22',
-    title: 'Pagamento pendente',
-    subtitle: 'Estamos aguardando a confirmação. Assim que aprovado, seu presente ficará disponível.',
+    title: 'Aguardando confirmação',
+    subtitle: 'Você pagou via PIX? Esta página verifica automaticamente e vai atualizar assim que o pagamento for confirmado.',
   },
 }
 
@@ -41,6 +42,34 @@ export default function PaymentResultPage({ status }) {
   const config = STATUS_CONFIG[status] ?? STATUS_CONFIG.failure
 
   const qrCanvasRef = useRef(null)
+
+  // Polling para pagamento PIX: quando pendente, verifica a cada 3s até ficar paid
+  useEffect(() => {
+    if (status !== 'pending' || !slug || !supabase) return
+
+    let attempts = 0
+    const MAX_ATTEMPTS = 100 // ~5 minutos
+
+    const interval = setInterval(async () => {
+      attempts++
+      if (attempts > MAX_ATTEMPTS) {
+        clearInterval(interval)
+        return
+      }
+      const { data } = await supabase
+        .from('gifts')
+        .select('status')
+        .eq('slug', slug)
+        .maybeSingle()
+
+      if (data?.status === 'paid') {
+        clearInterval(interval)
+        navigate(`/pagamento/sucesso?slug=${slug}`, { replace: true })
+      }
+    }, 3000)
+
+    return () => clearInterval(interval)
+  }, [status, slug, navigate])
 
   useEffect(() => {
     if (status === 'success' && url && qrCanvasRef.current) {
