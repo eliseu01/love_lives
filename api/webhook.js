@@ -99,7 +99,7 @@ export default async function handler(req, res) {
     }
 
     // 5. Atualizar o presente para 'paid'
-    const { error: updateError } = await supabase
+    const { data: updatedGift, error: updateError } = await supabase
       .from('gifts')
       .update({
         status: 'paid',
@@ -107,12 +107,15 @@ export default async function handler(req, res) {
       })
       .eq('id', giftId)
       .eq('status', 'draft') // só atualiza se ainda for draft (idempotente)
+      .select('edition')
+      .single()
 
     if (updateError) {
       console.error('Erro ao atualizar presente:', updateError)
       return res.status(500).json({ error: 'Erro ao atualizar' })
     }
 
+    console.log(`Pagamento confirmado: gift ${giftId}, edition ${updatedGift?.edition}`)
     return res.status(200).json({ ok: true, status: 'paid' })
 
   } catch (error) {

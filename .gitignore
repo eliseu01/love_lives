@@ -18,6 +18,11 @@ landing_implementation_guide.md
 payment_implementation_guide.md
 security_fixes_guide.md
 qrcode_implementation_guide.md
+Fase_1_Refatoracao_Editions.md
+Fase_2_Backend_Edition.md
+Fase_3_Edicao_Maes.md
+Fase_4_Visual_Maes.md
+Fase_5_Deploy_Subdominio.md
 
 # Editor directories and files
 .vscode/*

@@ -10,8 +10,14 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_KEY
 )
 
-const SITE_URL = process.env.SITE_URL
+const SITE_URL   = process.env.SITE_URL
 const GIFT_PRICE = parseFloat(process.env.GIFT_PRICE || '24.90')
+
+// URLs permitidas para back_urls — evita open redirect via body manipulation
+const ALLOWED_URLS = [
+  process.env.SITE_URL,
+  process.env.MOTHERS_DAY_URL,
+].filter(Boolean)
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -33,7 +39,7 @@ export default async function handler(req, res) {
     }
 
     // 2. Validar o gift_id
-    const { gift_id } = req.body
+    const { gift_id, return_url_base } = req.body
 
     if (!gift_id) {
       return res.status(400).json({ error: 'gift_id é obrigatório' })
@@ -42,7 +48,7 @@ export default async function handler(req, res) {
     // 3. Buscar o presente e verificar que pertence ao usuário autenticado
     const { data: gift, error: fetchError } = await supabase
       .from('gifts')
-      .select('id, slug, names, status, user_id')
+      .select('id, slug, names, status, user_id, edition')
       .eq('id', gift_id)
       .single()
 
@@ -58,11 +64,15 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Presente já foi pago' })
     }
 
-    // 4. Usar SITE_URL fixa (não derivar do header Host)
+    // 4. Determinar a URL base de retorno — valida contra lista de URLs permitidas
     if (!SITE_URL) {
       console.error('SITE_URL não configurada')
       return res.status(500).json({ error: 'Configuração do servidor incompleta' })
     }
+
+    const baseUrl = ALLOWED_URLS.includes(return_url_base)
+      ? return_url_base
+      : SITE_URL  // fallback seguro se URL não reconhecida
 
     // 5. Criar preferência no Mercado Pago
     const preference = new Preference(mp)
@@ -78,12 +88,17 @@ export default async function handler(req, res) {
           },
         ],
         back_urls: {
-          success: `${SITE_URL}/pagamento/sucesso?slug=${gift.slug}`,
-          failure: `${SITE_URL}/pagamento/erro?slug=${gift.slug}`,
-          pending: `${SITE_URL}/pagamento/pendente?slug=${gift.slug}`,
+          success: `${baseUrl}/pagamento/sucesso?slug=${gift.slug}`,
+          failure: `${baseUrl}/pagamento/erro?slug=${gift.slug}`,
+          pending: `${baseUrl}/pagamento/pendente?slug=${gift.slug}`,
         },
         auto_return: 'approved',
         external_reference: gift.id,
+        metadata: {
+          gift_id: gift.id,
+          user_id: gift.user_id,
+          edition: gift.edition,
+        },
         notification_url: `${SITE_URL}/api/webhook`,
         payment_methods: {
           excluded_payment_types: [
@@ -106,7 +121,8 @@ export default async function handler(req, res) {
     })
 
   } catch (error) {
-    console.error('Erro ao criar preferência:', error)
-    return res.status(500).json({ error: 'Erro interno' })
+    console.error('Erro ao criar preferência:', error?.message ?? error)
+    const msg = error?.cause?.message || error?.message || 'Erro interno'
+    return res.status(500).json({ error: msg })
   }
 }

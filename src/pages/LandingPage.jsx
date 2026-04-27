@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import PaperTexture, { paperStyle } from '../components/PaperTexture'
-import envelopeClosed from '../assets/envelope/envelope_closed.webp'
+import { useEdition } from '../contexts/EditionContext'
 
 const PJS = "'Plus Jakarta Sans', sans-serif"
 const DS  = "'Dancing Script', cursive"
@@ -65,6 +65,7 @@ const HEARTS = [
 
 // ── Seção 1: Hero ─────────────────────────────────────────────────────────────
 function HeroSection({ onCta, onDemo }) {
+  const { copy, assets } = useEdition()
   return (
     <section style={{
       ...paperStyle,
@@ -109,7 +110,7 @@ function HeroSection({ onCta, onDemo }) {
           transition={{ duration: 0.6, ease: 'easeOut' }}
         >
           <motion.img
-            src={envelopeClosed}
+            src={assets.envelopeClosed}
             alt="envelope"
             animate={{ y: [0, -8, 0] }}
             transition={{ repeat: Infinity, duration: 3.6, ease: 'easeInOut' }}
@@ -148,8 +149,7 @@ function HeroSection({ onCta, onDemo }) {
             letterSpacing: '-0.02em', margin: 0,
           }}
         >
-          Surpreenda quem{' '}
-          <span style={{ color: C.primary }}>você ama</span>
+          {copy.landing.heroTitle}
         </motion.h1>
 
         <motion.p
@@ -163,8 +163,7 @@ function HeroSection({ onCta, onDemo }) {
             maxWidth: 300, marginTop: 14,
           }}
         >
-          Crie uma página personalizada com carta, fotos e a música de vocês.
-          Compartilhe o link — eles nunca vão esquecer.
+          {copy.landing.heroSubtitle}
         </motion.p>
 
         <motion.div
@@ -174,7 +173,7 @@ function HeroSection({ onCta, onDemo }) {
           style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, marginTop: 32 }}
         >
           <PrimaryBtn onClick={onCta}>
-            Criar minha carta ♥
+            {copy.landing.heroCtaPrimary}
           </PrimaryBtn>
 
           <button
@@ -186,7 +185,7 @@ function HeroSection({ onCta, onDemo }) {
               border: `1.5px solid ${C.accent}`, borderRadius: 28, cursor: 'pointer',
             }}
           >
-            Ver exemplo ao vivo →
+            {copy.landing.heroCtaSecondary}
           </button>
         </motion.div>
 
@@ -660,6 +659,7 @@ function FaqSection() {
 
 // ── Seção 7: CTA Final ────────────────────────────────────────────────────────
 function CtaFinalSection({ onCta, onLogin }) {
+  const { copy } = useEdition()
   return (
     <section style={{
       ...paperStyle,
@@ -688,6 +688,13 @@ function CtaFinalSection({ onCta, onLogin }) {
           <QrCodeSVG size={112} />
         </motion.div>
 
+        <motion.div
+          {...fadeUp(0.05)}
+          style={{ fontSize: 40, marginBottom: 8 }}
+        >
+          {copy.landing.ctaFinalEmoji}
+        </motion.div>
+
         <motion.h2
           {...fadeUp(0.1)}
           style={{
@@ -696,7 +703,7 @@ function CtaFinalSection({ onCta, onLogin }) {
             color: C.text, margin: 0, lineHeight: 1.2,
           }}
         >
-          Vamos fazer um presente surpresa para o seu amor?
+          {copy.landing.ctaFinalTitle}
         </motion.h2>
 
         <motion.p

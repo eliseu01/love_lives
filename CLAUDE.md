@@ -74,6 +74,26 @@ npm run build     # verifica erros de compilação
 ```
 O arquivo `.env` deve ter `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY` para produção. Em dev, pode ficar vazio — o hook usa DEV_DATA.
 
+## Sistema de Editions
+O projeto suporta múltiplas edições temáticas via `VITE_EDITION`. Cada edição em `src/editions/{id}/config.js` define copy, assets e decorações específicas. O `EditionContext` distribui a config para os componentes via hook `useEdition()`. Edição atual: `valentines`.
+
+Cada presente tem uma coluna `edition` na tabela `gifts` (default `'valentines'`). Queries de leitura (`useGiftData`), edição (`EditorPage`) e listagem (`DashboardPage`) filtram por `edition.id` lido do `useEdition()`. A edição é imutável depois da criação (o update não inclui `edition`). Sessões de auth do Supabase são por origin/subdomínio (não compartilhadas).
+
+## Deploy multi-subdomínio
+O projeto roda em duas instâncias Vercel a partir do mesmo repo Git:
+- `lovestorybr.com` — projeto Vercel `lovestory`, `VITE_EDITION=valentines`
+- `maes.lovestorybr.com` — projeto Vercel `lovestory-maes`, `VITE_EDITION=mothers-day`
+
+Ambos compartilham Supabase, conta MP, e webhook (configurado em `lovestorybr.com/api/webhook`). A edição é gravada na criação do presente e usada como filtro em todas as queries. O frontend envia `return_url_base` (via `getEditionUrl`) no body do `/api/create-preference`; o backend valida contra `ALLOWED_URLS` antes de usar nas `back_urls` do MP.
+
+Para criar uma nova edição futura:
+1. Adicionar `src/editions/{id}/` com `config.js`, assets, decoration.
+2. Registrar em `src/editions/index.js`.
+3. Adicionar URL em `src/lib/editionUrls.js`.
+4. Adicionar a nova URL env var em `ALLOWED_URLS` no `api/create-preference.js`.
+5. Criar novo projeto Vercel com env vars correspondentes.
+6. Configurar DNS do subdomínio.
+
 ## Preferências do desenvolvedor
 - Iniciante em front-end/React — explicar conceitos novos antes do código
 - Direto, sem analogias

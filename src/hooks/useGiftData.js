@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
+import { useEdition } from '../contexts/EditionContext'
 
 // Dados de exemplo para desenvolvimento local (antes de conectar ao Supabase)
 const DEV_DATA = {
@@ -20,6 +21,7 @@ Te amo hoje e sempre.`,
 }
 
 export function useGiftData(slug) {
+  const edition = useEdition()
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -43,6 +45,7 @@ export function useGiftData(slug) {
           .from('gifts')
           .select('*')
           .eq('slug', slug)
+          .eq('edition', edition.id)
           .single()
 
         if (fetchError) throw fetchError
@@ -57,7 +60,7 @@ export function useGiftData(slug) {
     }
 
     fetchGift()
-  }, [slug])
+  }, [slug, edition.id])
 
   return { data, loading, error }
 }

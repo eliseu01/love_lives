@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../hooks/useAuth'
+import { useEdition } from '../contexts/EditionContext'
+import { getEditionUrl } from '../lib/editionUrls'
 
 const PJS = "'Plus Jakarta Sans', sans-serif"
 const COLORS = {
@@ -16,6 +18,7 @@ const COLORS = {
 export default function DashboardPage() {
   const navigate = useNavigate()
   const { user, signOut } = useAuth()
+  const edition = useEdition()
 
   const [gifts, setGifts] = useState([])
   const [loading, setLoading] = useState(true)
@@ -26,6 +29,7 @@ export default function DashboardPage() {
       .from('gifts')
       .select('*')
       .eq('user_id', user.id)
+      .eq('edition', edition.id)
       .order('created_at', { ascending: false })
       .then(({ data }) => {
         setGifts(data ?? [])
@@ -68,7 +72,7 @@ export default function DashboardPage() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${session?.access_token}`,
         },
-        body: JSON.stringify({ gift_id: gift.id }),
+        body: JSON.stringify({ gift_id: gift.id, return_url_base: getEditionUrl(edition.id) }),
       })
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || 'Erro ao criar pagamento')

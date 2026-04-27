@@ -1,23 +1,23 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
-import envelopeClosed  from '../assets/envelope/envelope_closed.webp'
-import envelopeOpening from '../assets/envelope/envelope_opening.webp'
 import PaperTexture, { paperStyle } from './PaperTexture'
+import { useEdition } from '../contexts/EditionContext'
 
 // Estados: 'closed' → 'opening' → 'expanded'
 
-function getTimeLabel(startDate) {
+// Retorna somente a duração, sem "há" — o prefixo vem do headerTemplate da edição
+function getDuration(startDate) {
   if (!startDate) return ''
   const diff = Date.now() - new Date(startDate).getTime()
   const days = Math.floor(diff / (1000 * 60 * 60 * 24))
   const years = Math.floor(days / 365)
   const months = Math.floor((days % 365) / 30)
 
-  if (years > 0 && months > 0) return `há ${years} ano${years > 1 ? 's' : ''} e ${months} ${months > 1 ? 'meses' : 'mês'}`
-  if (years > 0) return `há ${years} ano${years > 1 ? 's' : ''}`
-  if (months > 0) return `há ${months} ${months > 1 ? 'meses' : 'mês'}`
-  return `há ${days} dia${days !== 1 ? 's' : ''}`
+  if (years > 0 && months > 0) return `${years} ano${years > 1 ? 's' : ''} e ${months} ${months > 1 ? 'meses' : 'mês'}`
+  if (years > 0) return `${years} ano${years > 1 ? 's' : ''}`
+  if (months > 0) return `${months} ${months > 1 ? 'meses' : 'mês'}`
+  return `${days} dia${days !== 1 ? 's' : ''}`
 }
 
 const FADE = {
@@ -28,6 +28,7 @@ const FADE = {
 }
 
 export default function LetterSection({ letterText, names, startDate, onMusicStart }) {
+  const { assets, copy } = useEdition()
   const [stage, setStage] = useState('closed')
 
   function handleEnvelopeClick() {
@@ -65,10 +66,10 @@ export default function LetterSection({ letterText, names, startDate, onMusicSta
                 marginBottom: 4,
               }}
             >
-              {getTimeLabel(startDate)} eu te amo
+              {copy.letter.headerTemplate.replace('{duration}', getDuration(startDate))}
             </p>
             <motion.img
-              src={envelopeClosed}
+              src={assets.envelopeClosed}
               alt="envelope fechado"
               style={{ width: '100%', maxWidth: 280 }}
               animate={{ scale: [1, 1.03, 1] }}
@@ -80,7 +81,7 @@ export default function LetterSection({ letterText, names, startDate, onMusicSta
               animate={{ opacity: [1, 0.4, 1] }}
               transition={{ duration: 1.5, repeat: Infinity }}
             >
-              toque para abrir
+              {copy.letter.tapToOpen}
             </motion.p>
           </motion.div>
         )}
@@ -89,7 +90,7 @@ export default function LetterSection({ letterText, names, startDate, onMusicSta
         {stage === 'opening' && (
           <motion.img
             key="opening"
-            src={envelopeOpening}
+            src={assets.envelopeOpening}
             alt="envelope abrindo"
             style={{ width: '100%', maxWidth: 280 }}
             {...FADE}

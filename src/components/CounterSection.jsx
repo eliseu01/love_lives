@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import PaperTexture, { paperStyle } from './PaperTexture'
+import { useEdition } from '../contexts/EditionContext'
 
 function getElapsed(startDate) {
   const start = new Date(startDate).getTime()
@@ -81,6 +82,7 @@ function Separator() {
 }
 
 export default function CounterSection({ names, startDate }) {
+  const { copy } = useEdition()
   const [elapsed, setElapsed] = useState(() => getElapsed(startDate))
 
   useEffect(() => {
@@ -111,7 +113,7 @@ export default function CounterSection({ names, startDate }) {
             letterSpacing: '-0.01em',
           }}
         >
-          te amo a ❤️
+          {copy.counter.title}
         </p>
 
         <div
@@ -139,7 +141,7 @@ export default function CounterSection({ names, startDate }) {
               color: '#a08060',
             }}
           >
-            {names} · juntos há
+            {names} · {copy.counter.subtitle}
           </p>
 
           <div className="flex items-end gap-1">

@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../hooks/useAuth'
+import { useEdition } from '../contexts/EditionContext'
+import { getEditionUrl } from '../lib/editionUrls'
 
 const PJS = "'Plus Jakarta Sans', sans-serif"
 const COLORS = {
@@ -26,6 +28,26 @@ const CAPTION_PLACEHOLDERS = [
 
 function isValidYouTubeUrl(url) {
   return url.includes('youtube.com/watch?v=') || url.includes('youtu.be/')
+}
+
+function compressImage(file, maxPx = 1200, quality = 0.82) {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    const url = URL.createObjectURL(file)
+    img.onload = () => {
+      URL.revokeObjectURL(url)
+      const scale = Math.min(1, maxPx / Math.max(img.width, img.height))
+      const w = Math.round(img.width * scale)
+      const h = Math.round(img.height * scale)
+      const canvas = document.createElement('canvas')
+      canvas.width = w
+      canvas.height = h
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h)
+      canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Falha ao comprimir imagem')), 'image/jpeg', quality)
+    }
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Imagem inválida')) }
+    img.src = url
+  })
 }
 
 function formatSlug(value) {
@@ -104,6 +126,7 @@ function Field({ label, hint, children }) {
 // ── Steps ─────────────────────────────────────────────────────────────────────
 
 function Step1({ form, updateForm }) {
+  const { copy } = useEdition()
   const [focused, setFocused] = useState(null)
   const today = new Date().toISOString().split('T')[0]
 
@@ -124,7 +147,7 @@ function Step1({ form, updateForm }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-      <Field label="Nomes do casal" hint="Use & para separar os nomes">
+      <Field label={copy.editor.step1Title} hint="Use & para separar os nomes">
         <input
           type="text"
           value={form.names}
@@ -136,7 +159,7 @@ function Step1({ form, updateForm }) {
         />
       </Field>
 
-      <Field label="Quando o relacionamento começou?">
+      <Field label={copy.editor.step1DateLabel}>
         <input
           type="date"
           value={form.start_date}
@@ -610,6 +633,7 @@ export default function EditorPage() {
   const { slug } = useParams()
   const navigate = useNavigate()
   const { user } = useAuth()
+  const edition = useEdition()
   const isEditing = !!slug
 
   const [step, setStep] = useState(1)
@@ -634,6 +658,7 @@ export default function EditorPage() {
       .select('*')
       .eq('slug', slug)
       .eq('user_id', user.id)
+      .eq('edition', edition.id)
       .single()
       .then(({ data, error: fetchError }) => {
         if (fetchError || !data) { navigate('/meus-presentes'); return }
@@ -689,11 +714,11 @@ export default function EditorPage() {
       const uploadedPhotos = await Promise.all(
         form.photos.map(async (photo, i) => {
           if (photo.file) {
-            const ext = photo.file.name.split('.').pop() || 'jpg'
-            const path = `${user.id}/${Date.now()}-${i}.${ext}`
+            const compressed = await compressImage(photo.file)
+            const path = `${user.id}/${Date.now()}-${i}.jpg`
             const { error: uploadError } = await supabase.storage
               .from('photos')
-              .upload(path, photo.file)
+              .upload(path, compressed, { contentType: 'image/jpeg' })
             if (uploadError) throw uploadError
             const { data: { publicUrl } } = supabase.storage
               .from('photos')
@@ -725,7 +750,7 @@ export default function EditorPage() {
         // Criação: insere como draft e redireciona para pagamento
         const { data: gift, error: dbError } = await supabase
           .from('gifts')
-          .insert({ ...payload, slug: form.slug, status: 'draft' })
+          .insert({ ...payload, slug: form.slug, status: 'draft', edition: edition.id })
           .select('id')
           .single()
         if (dbError) throw dbError
@@ -737,9 +762,13 @@ export default function EditorPage() {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${session?.access_token}`,
           },
-          body: JSON.stringify({ gift_id: gift.id }),
+          body: JSON.stringify({ gift_id: gift.id, return_url_base: getEditionUrl(edition.id) }),
         })
-        const data = await response.json()
+        const rawText = await response.text()
+        let data = {}
+        try { data = JSON.parse(rawText) } catch {
+          throw new Error(`Erro do servidor (${response.status}): resposta inválida`)
+        }
         if (!response.ok) throw new Error(data.error || 'Erro ao criar pagamento')
 
         const mpEnv = import.meta.env.VITE_MP_ENV || 'sandbox'
