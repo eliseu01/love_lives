@@ -772,7 +772,9 @@ export default function EditorPage() {
         if (!response.ok) throw new Error(data.error || 'Erro ao criar pagamento')
 
         const mpEnv = import.meta.env.VITE_MP_ENV || 'sandbox'
-        window.location.href = mpEnv === 'production' ? data.init_point : data.sandbox_init_point
+        const mpUrl = mpEnv === 'production' ? data.init_point : data.sandbox_init_point
+        window.open(mpUrl, '_blank')
+        navigate(`/pagamento/pendente?slug=${form.slug}`)
       }
     } catch (err) {
       setError(err.message)
