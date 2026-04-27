@@ -4,7 +4,6 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../hooks/useAuth'
 import { useEdition } from '../contexts/EditionContext'
 import { getEditionUrl } from '../lib/editionUrls'
-import { openMpPopup } from '../lib/mpPopup'
 
 const PJS = "'Plus Jakarta Sans', sans-serif"
 const COLORS = {
@@ -774,8 +773,7 @@ export default function EditorPage() {
 
         const mpEnv = import.meta.env.VITE_MP_ENV || 'sandbox'
         const mpUrl = mpEnv === 'production' ? data.init_point : data.sandbox_init_point
-        openMpPopup(mpUrl)
-        navigate(`/pagamento/pendente?slug=${form.slug}`)
+        window.location.href = mpUrl
       }
     } catch (err) {
       setError(err.message)

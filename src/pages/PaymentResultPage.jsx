@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import QRCode from 'qrcode'
 import { supabase } from '../lib/supabase'
-import { closeMpPopup } from '../lib/mpPopup'
 
 const PJS = "'Plus Jakarta Sans', sans-serif"
 const COLORS = {
@@ -65,7 +64,6 @@ export default function PaymentResultPage({ status }) {
 
       if (data?.status === 'paid') {
         clearInterval(interval)
-        closeMpPopup()
         navigate(`/pagamento/sucesso?slug=${slug}`, { replace: true })
       }
     }, 3000)
