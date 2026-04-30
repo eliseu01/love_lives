@@ -21,6 +21,8 @@ export default {
       heroCtaSecondary: 'Ver demo →',
       ctaFinalEmoji: '💌',
       ctaFinalTitle: 'Crie seu presente agora',
+      socialProof: '+2.800 casais surpreendidos',
+      statsLabel: 'casais felizes',
     },
 
     editor: {

@@ -21,6 +21,8 @@ export default {
       heroCtaSecondary: 'Ver demo →',
       ctaFinalEmoji: '💐',
       ctaFinalTitle: 'Crie o presente da sua mãe agora',
+      socialProof: '+2.800 mães surpreendidas',
+      statsLabel: 'mães felizes',
     },
 
     editor: {

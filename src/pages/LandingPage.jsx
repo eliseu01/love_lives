@@ -210,7 +210,7 @@ function HeroSection({ onCta, onDemo }) {
             ))}
           </div>
           <span style={{ fontFamily: PJS, fontSize: 13, color: C.muted }}>
-            <strong style={{ color: C.text }}>+2.800 casais</strong> surpreendidos
+            <strong style={{ color: C.text }}>{copy.landing.socialProof}</strong>
           </span>
         </motion.div>
       </div>
@@ -220,6 +220,7 @@ function HeroSection({ onCta, onDemo }) {
 
 // ── Seção 2: Prova social — viralizou ─────────────────────────────────────────
 function ViralSection({ onCta }) {
+  const { copy } = useEdition()
   return (
     <section style={{ background: C.bgAlt, padding: '64px 24px' }}>
       <motion.p
@@ -317,7 +318,7 @@ function ViralSection({ onCta }) {
         display: 'flex', justifyContent: 'center', gap: 32, marginTop: 32,
       }}>
         {[
-          { num: '+2.800', label: 'casais felizes' },
+          { num: '+2.800', label: copy.landing.statsLabel },
           { num: '5 min', label: 'para criar' },
           { num: '100%', label: 'personalizado' },
         ].map(({ num, label }, i) => (
