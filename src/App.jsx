@@ -6,6 +6,7 @@ import DashboardPage from './pages/DashboardPage'
 import LandingPage from './pages/LandingPage'
 import PaymentResultPage from './pages/PaymentResultPage'
 import ProtectedRoute from './components/ProtectedRoute'
+import MetaPixel from './components/MetaPixel'
 import { Analytics } from "@vercel/analytics/react"
 import { SpeedInsights } from "@vercel/speed-insights/react"
 
@@ -41,6 +42,7 @@ export default function App() {
           <Route path="/" element={<LandingPage />} />
         </Routes>
       </BrowserRouter>
+      <MetaPixel />
       <Analytics />
       <SpeedInsights />
     </>
