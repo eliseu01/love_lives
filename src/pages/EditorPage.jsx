@@ -653,7 +653,7 @@ export default function EditorPage() {
 
   // Carrega dados existentes no modo edição
   useEffect(() => {
-    if (!isEditing || !supabase) return
+    if (!isEditing || !supabase || !user) return
     supabase
       .from('gifts')
       .select('*')
@@ -672,7 +672,7 @@ export default function EditorPage() {
           slug: data.slug ?? '',
         })
       })
-  }, [isEditing, slug])
+  }, [isEditing, slug, user])
 
   // Verifica disponibilidade do slug (só no modo criação)
   useEffect(() => {
