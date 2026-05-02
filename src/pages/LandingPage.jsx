@@ -70,12 +70,12 @@ function HeroSection({ onCta, onDemo }) {
     <section style={{
       ...paperStyle,
       position: 'relative',
-      minHeight: '100vh',
+      minHeight: '88vh',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: '56px 24px',
+      padding: '56px 24px 48px',
       overflow: 'hidden',
     }}>
       <PaperTexture />
@@ -214,6 +214,29 @@ function HeroSection({ onCta, onDemo }) {
           </span>
         </motion.div>
       </div>
+
+      {/* Indicador de scroll */}
+      <motion.div
+        animate={{ y: [0, 8, 0] }}
+        transition={{ repeat: Infinity, duration: 1.4, ease: 'easeInOut' }}
+        style={{
+          position: 'absolute',
+          bottom: 20,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          zIndex: 2,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 4,
+          opacity: 0.5,
+          pointerEvents: 'none',
+        }}
+      >
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M4 7l6 6 6-6" stroke={C.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </motion.div>
     </section>
   )
 }
