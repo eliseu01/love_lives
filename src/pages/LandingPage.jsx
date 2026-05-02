@@ -245,7 +245,7 @@ function HeroSection({ onCta, onDemo }) {
 function ViralSection({ onCta }) {
   const { copy } = useEdition()
   return (
-    <section style={{ background: C.bgAlt, padding: '32px 24px' }}>
+    <section style={{ background: C.bgAlt, padding: '44px 24px' }}>
       <motion.p
         {...fadeUp(0)}
         style={{
