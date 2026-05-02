@@ -70,7 +70,7 @@ function HeroSection({ onCta, onDemo }) {
     <section style={{
       ...paperStyle,
       position: 'relative',
-      minHeight: '88vh',
+      minHeight: '78vh',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
