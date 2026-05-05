@@ -1,12 +1,16 @@
 import { useEffect } from 'react'
 
-const PIXEL_ID = '1230100795673155'
+const PIXEL_IDS = {
+  valentines: '1230100795673155',
+  'mothers-day': '839445765320983',
+}
 
 export default function MetaPixel() {
   const edition = import.meta.env.VITE_EDITION
+  const PIXEL_ID = PIXEL_IDS[edition]
 
   useEffect(() => {
-    if (edition !== 'valentines') return
+    if (!PIXEL_ID) return
     if (window.fbq) return
 
     ;(function (f, b, e, v, n, t, s) {
@@ -25,7 +29,7 @@ export default function MetaPixel() {
     window.fbq('track', 'PageView')
   }, [])
 
-  if (edition !== 'valentines') return null
+  if (!PIXEL_ID) return null
 
   return (
     <noscript>
