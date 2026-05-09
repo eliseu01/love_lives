@@ -1,7 +1,6 @@
 {
   "rewrites": [
-    { "source": "/", "destination": "/lp.html" },
-    { "source": "/p/:slug", "destination": "/index.html" },
+{ "source": "/p/:slug", "destination": "/index.html" },
     { "source": "/login", "destination": "/index.html" },
     { "source": "/meus-presentes", "destination": "/index.html" },
     { "source": "/criar", "destination": "/index.html" },
